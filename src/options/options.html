@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>LinkQR settings</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+
+<body>
+    <main>
+        <h1 data-locale="optionsTitle">LinkQR settings</h1>
+        <section class="setting">
+            <label for="upgradeHttpToHttps">
+                <input id="upgradeHttpToHttps" name="upgradeHttpToHttps" type="checkbox" checked>
+                <span data-locale="upgradeHttpToHttpsLabel">Automatically upgrade HTTP URLs to HTTPS</span>
+            </label>
+            <p data-locale="upgradeHttpToHttpsDescription">
+                When enabled, LinkQR changes URLs beginning with http:// to https:// before generating a QR code.
+            </p>
+        </section>
+        <p id="save-status" role="status" aria-live="polite"></p>
+    </main>
+    <script src="options.js"></script>
+</body>
+
+</html>

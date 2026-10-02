@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-10-02
+### Changed
+- Refined popup spacing, control sizing, nested corner radii, and the PNG/SVG split download control while preserving the icon-only copy action and its green success state.
+
+## [0.16.0] - 2026-10-02
+### Added
+- Added a default-on HTTP-to-HTTPS option in the extension settings page. It applies to current-tab URLs, context-menu links, and URLs entered in the popup or new-tab QR editor, and can be disabled by the user.
+
+## [0.15.0] - 2026-10-02
+### Added
+- Added an Extensions menu fallback for Firefox states that hide address-bar actions.
+
+### Changed
+- Kept the LinkQR address-bar button and made it available on all matching URLs.
+- Updated the keyboard shortcut and context-menu actions to open the fallback popup.
+- Adapted the address-bar icon to light and dark Firefox themes and used the original logo for the fallback.
 
 ## [Released]
 

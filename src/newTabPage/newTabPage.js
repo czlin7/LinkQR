@@ -1,6 +1,8 @@
 // DOM elements
 const $urlBar = document.querySelector(".urlBar");
 const $qr = document.querySelector(".qr");
+let renderGeneration = 0;
+const initialRenderGeneration = renderGeneration;
 
 // Function to draw QR code
 function drawQr(text) {
@@ -39,10 +41,26 @@ function drawQr(text) {
     $qr.appendChild(svgElement);
 }
 
+function updateQrFromInput(inputValue) {
+    const generation = ++renderGeneration;
+    LinkQRUrl.applyHttpsPreference(inputValue).then((url) => {
+        if (generation !== renderGeneration) {
+            return;
+        }
+        if ($urlBar.value !== url) {
+            $urlBar.value = url;
+        }
+        drawQr(url);
+    }).catch(console.error);
+}
+
 // Retrieve the input value from the background script
-browser.runtime.sendMessage({ request: "getInputValue" }).then((response) => {
+browser.runtime.sendMessage({ request: "getInputValue" }).then(async (response) => {
     if (response.inputValue) {
-        const url = response.inputValue;
+        const url = await LinkQRUrl.applyHttpsPreference(response.inputValue);
+        if (renderGeneration !== initialRenderGeneration) {
+            return;
+        }
         $urlBar.value = url; // Set the value of the input bar
         drawQr(url); // Generate the QR code
     }
@@ -50,22 +68,7 @@ browser.runtime.sendMessage({ request: "getInputValue" }).then((response) => {
 
 // Update QR code when the user edits the URL
 $urlBar.addEventListener("input", function () {
-    drawQr(this.value);
-});
-
-
-// Retrieve the input value from the background script
-browser.runtime.sendMessage({ request: "getInputValue" }).then((response) => {
-    if (response.inputValue) {
-        const url = response.inputValue;
-        $urlBar.value = url; // Set the value of the input bar
-        drawQr(url); // Generate the QR code
-    }
-}).catch(console.error);
-
-// Update QR code when the user edits the URL
-$urlBar.addEventListener("input", function () {
-    drawQr(this.value);
+    updateQrFromInput(this.value);
 });
 
 // Recalculate QR code size whenever the window is resized

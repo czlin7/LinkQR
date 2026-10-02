@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "__MSG_extName__",
-  "version": "0.14.0",
+  "version": "0.17.0",
   "description": "__MSG_extDesc__",
   "default_locale": "en",
   "author": "koukaku01",
@@ -15,7 +15,8 @@
     "contextMenus",
     "activeTab",
     "tabs",
-    "clipboardWrite"
+    "clipboardWrite",
+    "storage"
   ],
   "background": {
     "scripts": [
@@ -23,7 +24,19 @@
     ],
     "persistent": false
   },
+  "browser_action": {
+    "default_area": "menupanel",
+    "default_icon": {
+      "32": "icons/ext-icon-32.png",
+      "64": "icons/ext-icon-64.png"
+    },
+    "default_title": "LinkQR (Ctrl+Alt+Q)",
+    "default_popup": "popup/popup.html"
+  },
   "page_action": {
+    "show_matches": [
+      "<all_urls>"
+    ],
     "default_icon": {
       "19": "icons/PA-icon-19.svg",
       "38": "icons/PA-icon-38.svg"
@@ -31,8 +44,12 @@
     "default_title": "LinkQR (Ctrl+Alt+Q)",
     "default_popup": "popup/popup.html"
   },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": false
+  },
   "commands": {
-    "_execute_page_action": {
+    "_execute_browser_action": {
       "suggested_key": {
         "default": "Ctrl+Alt+Q",
         "linux": "Ctrl+Alt+Q"

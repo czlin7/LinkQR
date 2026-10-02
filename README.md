@@ -2,7 +2,7 @@
     <img src="src/icons/ext-icon-64.png" alt="LinkQR icon">
     <h1>LinkQR</h1>
 	
-[![Extension Version](https://img.shields.io/badge/Version-0.14.0-blue)](https://github.com/czlin7/LinkQR/blob/main/manifest.json) [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![Extension Version](https://img.shields.io/badge/Version-0.16.0-blue)](https://github.com/czlin7/LinkQR/blob/main/manifest.json) [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 ![Firefox users](https://img.shields.io/amo/users/link-qr?label=Firefox%20users&color=orange)
 
 [Changelog](./CHANGELOG.md)
@@ -22,7 +22,8 @@ LinkQR is a Firefox extension that simplifies the process of converting web link
 - [Install](#install)
     - [Development and Testing](#development-and-testing)
 - [Usage](#usage)
-	- [Browser address bar button](#browser-address-bar-button)
+	- [Address bar button and Extensions menu fallback](#address-bar-button-and-extensions-menu-fallback)
+    - [Extension settings](#extension-settings)
     - [Context Menu Options](#context-menu-options)
     - [Keyboard shortcuts](#keyboard-shortcuts)
 - [Maintainers](#maintainers)
@@ -33,7 +34,7 @@ LinkQR is a Firefox extension that simplifies the process of converting web link
 ## Features
 
 - [x] Generates QR code from current tab URL
-- [x] Extension icon located at the end of the address bar
+- [x] Extension icon in the address bar, with a Firefox Extensions menu fallback
 - [x] Option to download QR Code as PNG or SVG
 - [x] Offline support
 - [x] Automatically adapts to user's Firefox theme (light or dark)
@@ -41,10 +42,10 @@ LinkQR is a Firefox extension that simplifies the process of converting web link
 - [x] Right-click context menu to generate QR code for current tab
 - [x] Right-click context menu to generate QR code for links
 - [x] Display QR code in a new tab with the option to add a description alongside with adjustable font size
+- [x] Automatically upgrade HTTP URLs to HTTPS, with a setting to disable it
 
 
 ### TODO
-- [ ] Enable HTTPS for All windows, with options to disable 
 - [ ] Tab right-click context menu
 - [ ] Scan QR code
 
@@ -65,9 +66,13 @@ To install the LinkQR Firefox extension for development and testing:
 
 ## Usage
 
-### Browser Address Bar Button
+### Address Bar Button and Extensions Menu Fallback
 
-Click the button next to the browser's address bar to instantly reveal the QR Code for the current webpage. You'll have the option to download or copy the code with ease.
+Click the LinkQR icon in the address bar to reveal the QR code for the current webpage. If Firefox displays a search term instead of the full address and hides address bar actions, open LinkQR from Firefox's Extensions menu, use the context menu, or press Ctrl+Alt+Q.
+
+### Extension Settings
+
+Open LinkQR's settings from its page in Firefox Add-ons Manager. **Automatically upgrade HTTP URLs to HTTPS** is on by default and applies to current-tab URLs, links opened from the context menu, and URLs entered in the popup or new-tab QR editor. The setting is shared across Firefox windows. Turn it off to preserve HTTP URLs for sites that do not support HTTPS.
 
 ### Context Menu Options
 

@@ -10,5 +10,20 @@
   },
   "popup_title": {
     "message": "Scan QR code"
+  },
+  "optionsTitle": {
+    "message": "LinkQR settings"
+  },
+  "upgradeHttpToHttpsLabel": {
+    "message": "Automatically upgrade HTTP URLs to HTTPS"
+  },
+  "upgradeHttpToHttpsDescription": {
+    "message": "When enabled, LinkQR changes URLs beginning with http:// to https:// before generating a QR code. This applies to current-tab URLs, context-menu links, and URLs entered in LinkQR, across all Firefox windows. Some websites do not support HTTPS; turn this off to preserve their HTTP URLs."
+  },
+  "settingsSaved": {
+    "message": "Settings saved."
+  },
+  "settingsSaveFailed": {
+    "message": "Could not save this setting."
   }
 }

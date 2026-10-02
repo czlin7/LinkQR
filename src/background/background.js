@@ -2,27 +2,6 @@
 let linkUrl = null;
 
 /* 
-  Event Listener: Tabs Updated
-  Triggered whenever a tab is updated (e.g., loaded, refreshed).
-  Ensures the page action (icon in the address bar) is visible on every tab.
-*/
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  browser.pageAction.show(tabId); // Display the page action icon
-});
-
-/* 
-  Event Listener: Tab Activated
-  Triggered whenever the user switches to a different tab.
-  Ensures the page action is visible on the active tab.
-*/
-browser.tabs.onActivated.addListener(activeInfo => {
-  // Fetch the active tab's details
-  browser.tabs.get(activeInfo.tabId).then(tab => {
-    browser.pageAction.show(tab.id); // Display the page action icon
-  });
-});
-
-/* 
   Context Menu Item: Open LinkQR
   Adds a menu item to the context menu (right-click menu) on any page.
   Used to open the LinkQR popup directly from the page.
@@ -52,13 +31,11 @@ browser.menus.create({
 browser.menus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "open-popup") {
     linkUrl = null; // Clear any previously stored link URL
-    browser.pageAction.show(tab.id); // Ensure the page action icon is visible
-    browser.pageAction.openPopup(); // Open the page action popup
+    browser.browserAction.openPopup(); // Open the Extensions menu fallback popup
   } else if (info.menuItemId === "open-popup-from-link") {
     linkUrl = info.linkUrl; // Store the clicked link's URL
     console.log('FROM-LINK: ' + linkUrl); // Log the link URL for debugging
-    browser.pageAction.show(tab.id); // Ensure the page action icon is visible
-    browser.pageAction.openPopup(); // Open the page action popup
+    browser.browserAction.openPopup(); // Open the Extensions menu fallback popup
   }
 });
 

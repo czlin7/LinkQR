@@ -3,6 +3,9 @@ const $text = document.querySelector(".inputbar"); // Input field for text
 const $qr = document.querySelector(".qr"); // Container for QR code display
 const $buttonCopy = document.querySelector(".buttonCopy"); // Button to copy QR code PNG image
 const SIZE = 798; // Size of the QR code
+let renderGeneration = 0;
+const initialRenderGeneration = renderGeneration;
+let copySuccessTimeout;
 
 // Function to draw QR code
 function drawQr(text) {
@@ -62,8 +65,16 @@ browser.runtime.sendMessage({ request: "getLinkUrl" }).then((response) => {
         return browser.tabs.query({ currentWindow: true, active: true });
     }
     return Promise.resolve([{ url: url }]);
-}).then((tabInfo) => {
-    const url = tabInfo[0].url;
+}).then(async (tabInfo) => {
+    if (!tabInfo[0]) {
+        return;
+    }
+
+    const url = await LinkQRUrl.applyHttpsPreference(tabInfo[0].url);
+    if (renderGeneration !== initialRenderGeneration) {
+        return;
+    }
+
     $text.value = url;
     drawQr(url);
 }).catch(console.error);
@@ -74,7 +85,18 @@ browser.runtime.sendMessage({ request: "clearLinkUrl" });
 
 // Event listeners
 $text.addEventListener("input", function () {
-    drawQr(this.value);
+    const generation = ++renderGeneration;
+    const inputValue = this.value;
+
+    LinkQRUrl.applyHttpsPreference(inputValue).then((url) => {
+        if (generation !== renderGeneration) {
+            return;
+        }
+        if ($text.value !== url) {
+            $text.value = url;
+        }
+        drawQr(url);
+    }).catch(console.error);
 });
 
 $text.addEventListener("focus", function () {
@@ -135,12 +157,25 @@ async function copyPngToClipboard() {
         // Copy the image data to the clipboard as PNG
         await browser.clipboard.setImageData(pngArrayBuffer, "png");
 
+        showCopySuccess();
+
         // Log a success message to the console
         console.log("QR code PNG image copied to clipboard successfully.");
     } catch (error) {
         // Log an error message to the console if copying fails
         console.error("Error copying QR code PNG image to clipboard:", error);
     }
+}
+
+function showCopySuccess() {
+    window.clearTimeout(copySuccessTimeout);
+    $buttonCopy.classList.add("copied");
+    $buttonCopy.setAttribute("aria-label", "QR code copied");
+
+    copySuccessTimeout = window.setTimeout(() => {
+        $buttonCopy.classList.remove("copied");
+        $buttonCopy.setAttribute("aria-label", "Copy QR code as PNG");
+    }, 1500);
 }
 
 
@@ -152,34 +187,10 @@ $buttonCopy.addEventListener("click", function () {
 
 
 
-// Event listeners
-$text.addEventListener("input", function () {
-    drawQr(this.value);
-});
-
-$text.addEventListener("focus", function () {
-    this.select();
-});
-
-// Listen for console log event
-console.log = function (message) {
-    // Check if the log message indicates the successful copy operation
-    if (message === "QR code PNG image copied to clipboard successfully.") {
-        // Show the message div
-        document.getElementById('message').style.display = 'block';
-
-        // Hide the message after 1.5 seconds
-        setTimeout(function () {
-            document.getElementById('message').style.display = 'none';
-        }, 1500);
-    }
-};
-
 // Handle download and selector for formats
 document.addEventListener("DOMContentLoaded", function () {
     const dropdownContainer = document.querySelector(".dropdown-container");
     const selector = dropdownContainer.querySelector(".selector");
-    const dropdownMenu = dropdownContainer.querySelector(".dropdown-menu");
     const dropdownItems = dropdownContainer.querySelectorAll(".dropdown-item");
     const downloadButton = document.querySelector(".download-button");
 
@@ -212,6 +223,10 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateDownloadButton(format) {
         selectedFormat = format;
         localStorage.setItem("selectedFormat", format);
+        downloadButton.setAttribute("aria-label", "Download QR code as " + format.toUpperCase());
+        dropdownItems.forEach(function (item) {
+            item.setAttribute("aria-checked", String(item.dataset.format === format));
+        });
 
         // Clear existing content
         while (downloadButton.firstChild) {
@@ -282,15 +297,17 @@ document.addEventListener("DOMContentLoaded", function () {
         // Append SVG to downloadButton
         downloadButton.appendChild(svg);
 
-        // Append text content
-        downloadButton.appendChild(document.createTextNode(format.toUpperCase()));
+        // Append the selected format beside the download icon.
+        const formatLabel = document.createElement("span");
+        formatLabel.className = "selected-format";
+        formatLabel.textContent = format.toUpperCase();
+        downloadButton.appendChild(formatLabel);
     }
-
-
 
     // Toggle dropdown menu
     selector.addEventListener("click", function () {
-        dropdownContainer.classList.toggle("open");
+        const isOpen = dropdownContainer.classList.toggle("open");
+        selector.setAttribute("aria-expanded", String(isOpen));
     });
 
     // Handle dropdown item selection
@@ -299,11 +316,30 @@ document.addEventListener("DOMContentLoaded", function () {
             const format = this.dataset.format;
             updateDownloadButton(format);
             dropdownContainer.classList.remove("open");
+            selector.setAttribute("aria-expanded", "false");
+            selector.focus();
         });
+    });
+
+    document.addEventListener("click", function (event) {
+        if (!dropdownContainer.contains(event.target)) {
+            dropdownContainer.classList.remove("open");
+            selector.setAttribute("aria-expanded", "false");
+        }
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && dropdownContainer.classList.contains("open")) {
+            dropdownContainer.classList.remove("open");
+            selector.setAttribute("aria-expanded", "false");
+            selector.focus();
+        }
     });
 
     // Handle download button click
     downloadButton.addEventListener("click", function () {
+        dropdownContainer.classList.remove("open");
+        selector.setAttribute("aria-expanded", "false");
         // Replace `qr_svg` with your actual SVG QR code variable or data
         const qr_svg = $qr.querySelector("svg").outerHTML;
         // Trigger download based on selected format and pass the QR code SVG data
